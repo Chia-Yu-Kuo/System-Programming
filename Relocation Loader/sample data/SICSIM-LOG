@@ -1,0 +1,27 @@
+SIC SIMULATOR Ver. 1.91 (202111.R02)
+
+COMMAND: S(tart, L(oad, R(un, E(nter, D(ump, H(count, B(kpt, Q(uit?
+l
+* Loading object code program ...  [HCOPY  00100000107A      ]
+
+  Total Object Code Records: 7         
+
+   + Type of object code: Absolute object code 
+   + Program/Image NCOPY               
+   + Starting Memory Address: 001000   
+   + Size of OBJ Program/Image: 00107A 
+   + Transfer Address: 001000  
+
+* OBJ Code Program/Memory Image Loaded.
+
+
+
+COMMAND: S(tart, L(oad, R(un, E(nter, D(ump, H(count, B(kpt, Q(uit?
+r
+Run COMMAND COMPLETED
+
+
+COMMAND: S(tart, L(oad, R(un, E(nter, D(ump, H(count, B(kpt, Q(uit?
+q
+
+// SIC simulator stops.

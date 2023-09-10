@@ -1,0 +1,221 @@
+.  Notes:
+.  (1) This program is the same as the program in Figure 2.5 (pp. 55)
+.  (2) This file is an example source program for SIC/XE Assembler
+.  (3) The fixed format of each line:
+.          COL. 1       - . (the entire line is comment)
+.          COL. 1 ~ 8   - Label (optional)
+.          COL. 9       - Blank
+.          COL. 10 ~ 15 - Operation code mnemonic or assembler directive
+.          COL. 16 ~ 17 - Blank
+.          COL. 18 ~ 35 - Operand(s)
+.          COL. 36 ~ 66 - Comment (optional)
+.  Usage:
+.  (A) Rename this file to SRCFILE
+.  (B) Execute SIC/XE assembler
+.
+.0       1         2         3         4         5         6         7
+.23456789012345678901234567890123456789012345678901234567890123456789012
+.
+.
+.
+.
+.
+.START
+HW1      START   1000
+FIRST    STL     RETADR            Save return address
+.read input PROCESS
+READ     LDX     ZERO              Clear loop counter
+         LDA     ONE               Clear  registerA to zero
+         STA     IDX               CURRENT POINT TO NUM1
+         LDA     ZERO
+         STA     DIG1
+         STA     DIG2
+         STA     NUM1              INITIALIZE NUM1 NUM2
+         STA     NUM2
+RLOOP    TD      INPUT             Test input device
+         JEQ     RLOOP             Loop until device ready
+         LDA     ZERO
+         STA     RECORD             INITIALIZE RECORD
+         RD      INPUT
+.check record
+.         LDA     ENTER                CHECK CHANGE LINE
+.         COMP    RECORD
+.         JEQ     MAIN
+         COMP    ZERO              Test for End-of-Record (X'00')
+         JEQ     MAIN              Exit loop if EOR encountered
+         LDA     SPACE               CHECK SPACE
+         COMP    RECORD
+         JEQ     SKIPSP
+.STORE RECORD
+         LDA     IDX
+         COMP    TWO
+         JEQ     ST2
+         J       ST1
+.SPACE PROCESS
+SKIPSP   LDA     TWO
+         STA     IDX
+         J       RLOOP
+ST1      LDX     DIG1
+         LDA     RECORD
+         STCH    BUFF1,X         
+         SUB     K48               SUBS ASCII 
+         STA     RECORD
+         LDA     NUM1
+         MUL     K10
+         ADD     RECORD
+         STA     NUM1
+         LDA     ONE
+         ADD     DIG1
+         J       RLOOP
+ST2      LDX     DIG2
+         LDA     RECORD
+         STCH    BUFF2,X
+         SUB     K48
+         STA     RECORD
+         LDA     NUM2
+         MUL     K10
+         ADD     RECORD
+         STA     NUM2
+         LDA     ONE
+         ADD     DIG2
+         J       RLOOP
+.COMPARE LARGE SMALL
+MAIN     LDA     ONE                  THE SMALLEST GCD
+         STA     GCD
+         LDA     NUM1
+         COMP    NUM2
+         JLT     TWOBIG              NUM2 IS BIGGER
+         LDA     NUM2                 NUM1 IS BIGGER
+         STA     RANGE               RANGE IS NUM2
+TWOBIG   LDA     NUM1             
+         STA     RANGE                RANGE IS NUM1
+.GCD
+FIND     LDX     ONE
+DIV1     LDA     NUM1
+         STX     GCDTEP            
+         DIV     GCDTEP            AREG IS Q
+         MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO NUN1
+         COMP    NUM1
+         JEQ     DIV2
+         J       ADD1       
+DIV2     LDA     NUM2
+         STX     GCDTEP            
+         DIV     GCDTEP            AREG IS Q
+         MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO NUN1
+         COMP    NUM2
+         JEQ     UPDATE
+         J       ADD1
+UPDATE   STX     GCD
+ADD1     TIX     RANGE
+         JLT     DIV1    
+.write output
+         LDX     ZERO               Initialize index register
+PUTCH1   LDCH    MSG1,X             Load via index the next char
+         TD      OUTDEV             Output Device ready?
+         JEQ     PUTCH1
+         WD      OUTDEV             Output/Display the character
+         TIX     MSIZE1             End of Message reached?
+         JLT     PUTCH1             Loop
+.
+         LDX     ZERO               Initialize index register
+WNUM1    LDCH    BUFF1,X             Load via index the next char
+         TD      OUTDEV             Output Device ready?
+         JEQ     WNUM1
+         WD      OUTDEV             Output/Display the character
+         TIX     DIG1               End of Message reached?
+         JLT     WNUM1              Loop
+.
+         LDX     ZERO               Initialize index register
+PUTCH2   LDCH    MSG2,X             Load via index the next char
+         TD      OUTDEV             Output Device ready?
+         JEQ     PUTCH2
+         WD      OUTDEV             Output/Display the character
+         TIX     MSIZE2             End of Message reached?
+         JLT     PUTCH2             Loop
+.
+         LDX     ZERO                Initialize index register
+WNUM2    LDCH    BUFF2,X             Load via index the next char
+         TD      OUTDEV              Output Device ready?
+         JEQ     WNUM2
+         WD      OUTDEV             Output/Display the character
+         TIX     DIG2                End of Message reached?
+         JLT     WNUM2              Loop
+.
+         LDX     ZERO               Initialize index register
+PUTCH3   LDCH    MSG3,X             Load via index the next char
+         TD      OUTDEV             Output Device ready?
+         JEQ     PUTCH3
+         WD      OUTDEV             Output/Display the character
+         TIX     MSIZE3             End of Message reached?
+         JLT     PUTCH3             Loop
+.
+OUTPUT   LDA     GCD
+DIV100   DIV     K100
+         STA     QUO1
+         COMP    ZERO
+         JEQ     DIV10
+         LDA     K48
+         ADD     QUO1
+         WD      OUTDEV             Output/Display the character
+DIV10    LDA     K100
+         MUL     QUO1
+         STA     TEMP
+         LDA     GCD
+         SUB     TEMP                GET TEN DECIMAL GCD
+         STA     TEMP2               STORE THE RESULT TO DIV1
+         DIV     K10
+         STA     QUO2
+         COMP    ZERO
+         JEQ     DIV1
+         LDA     K48
+         ADD     QUO2
+         WD      OUTDEV             Output/Display the character
+DIVONE   LDA     K10
+         MUL     QUO2
+         STA     TEMP
+         LDA     TEMP2
+         SUB     TEMP                GET TEN DECIMAL GCD 
+         STA     QUO3
+         LDA     K48
+         ADD     QUO3
+         WD      OUTDEV             Output/Display the character
+         RSUB                       Program Return/Exit
+..DATA
+RETADR   RESW    1
+ZERO     WORD    0
+ONE      WORD    1
+TWO      WORD    2
+THREE    WORD    3
+K10      WORD    10
+K48      WORD    48
+K100     WORD    100
+ENTER    WORD    10                CHAGE LINE
+SPACE    WORD    32
+.
+INPUT    BYTE    X'F3'             Code for the input device
+OUTDEV   BYTE    X'05'             Code for the output device
+RECORD   RESW    1    
+IDX      RESW    1                  CURRENT POINT TO NUM
+BUFF1    RESB    3
+BUFF2    RESB    3
+DIG1     RESW    1
+DIG2     RESW    1
+NUM1     RESW    1
+NUM2     RESW    1
+.
+GCD      RESW    1
+GCDTEP   RESW    1
+RANGE    RESW    1
+MSG1     BYTE    C'GCD('
+MSG2     BYTE    C', '
+MSG3     BYTE    C') ='
+MSIZE1   WORD    5                  Size of the message
+MSIZE2   WORD    3                  Size of the message
+MSIZE3   WORD    4                  Size of the message
+QUO1     WORD    1                  HUNDRED
+QUO2     WORD    1                  TEN
+QUO3     WORD    1                  ONE
+TEMP     WORD    1
+TEMP2    WORD    1
+.
+         END     FIRST                                                                                                                                                

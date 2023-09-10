@@ -1,0 +1,35 @@
+...
+         LDA	 #8
+         STA     ROW
+         STA     COLUMN
+.
+         LDX     #0
+         LDS     #3                  WORDBYTESIZR
+         LDT     #192
+.
+INI0     LDA	 #0
+         STA     MATRIX,X
+         ADDR    S,X
+         COMP	 X,T
+         JLT     INI0
+.
+DIA1     LDS     #0                  MATRIXINDEX
+         STS     TEMP                ZERO TO SEVEN
+         LDX     TEMP                CALCULATE INDEX
+         LDT     #8                  MAXVALUE and MULTIPLICAND
+         LDA	 #3                  WORDSIZE
+         MULR	 X,S
+         ADDR    X,S
+         MULR	 X,A
+         LDA	 #1                   UNIT MATRIX ELEMENT
+         STA     MATRIX,X             
+         ADDR    S,A
+         COMPR	 S,T
+         JLT     DIA1
+.        
+.DATA
+TEMP     RESW    1
+.
+ROW      RESW    1
+COLUMN   RESW    1
+MATRIX   RESW    64

@@ -1,0 +1,400 @@
+.  Notes:                                                         t0
+.  (1) This program is the same as the program in Figure 2.5 (pp. t0
+.  (2) This file is an example source program for SIC/XE Assemblert0
+.  (3) The fixed format of each line:                             t0
+.          COL. 1       - . (the entire line is comment)          t0
+.          COL. 1 ~ 8   - Label (optional)                        t0
+.          COL. 9       - Blank                                   t0
+.          COL. 10 ~ 15 - Operation code mnemonic or assembler dirt0
+.          COL. 16 ~ 17 - Blank                                   t0
+.          COL. 18 ~ 35 - Operand(s)                              t0
+.          COL. 36 ~ 66 - Comment (optional)                      t0
+.  Usage:                                                         t0
+.  (A) Rename this file to SRCFILE                                t0
+.  (B) Execute SIC/XE assembler                                   t0
+.                                                                 t0
+.0       1         2         3         4         5         6      t0
+.23456789012345678901234567890123456789012345678901234567890123456t0
+.                                                                 t0
+.                                                                 t0
+.                                                                 t0
+.                                                                 t0
+.                                                                 t0
+.START                                                            t0
+HW1      START   1000                                             f4096
+HW1     start 1000                                             f
+FIRST    STL     RETADR            Save return address            f4096
+FIRST   stl   RETADR            Save return address            f
+.read input PROCESS                                               t4099
+READ     LDX     ZERO              Clear loop counter             f4099
+READ    ldx   ZERO              Clear loop counter             f
+         LDA     ONE               Clear  registerA to zero       f4102
+        lda   ONE               Clear  registerA to zero       f
+         STA     IDX               CURRENT POINT TO NUM1          f4105
+        sta   IDX               CURRENT POINT TO NUM1          f
+         LDA     ZERO                                             f4108
+        lda   ZERO                                             f
+         STA     DIG1                                             f4111
+        sta   DIG1                                             f
+         STA     DIG2                                             f4114
+        sta   DIG2                                             f
+         STA     NUM1              INITIALIZE NUM1 NUM2           f4117
+        sta   NUM1              INITIALIZE NUM1 NUM2           f
+         STA     NUM2                                             f4120
+        sta   NUM2                                             f
+RLOOP    TD      INPUT             Test input device              f4123
+RLOOP   td    INPUT             Test input device              f
+         JEQ     RLOOP             Loop until device ready        f4126
+        jeq   RLOOP             Loop until device ready        f
+         LDA     ZERO                                             f4129
+        lda   ZERO                                             f
+         STA     RECORD             INITIALIZE RECORD             f4132
+        sta   RECORD             INITIALIZE RECORD             f
+         RD      INPUT                                            f4135
+        rd    INPUT                                            f
+.check record                                                     t4138
+.         LDA     ENTER                CHECK CHANGE LINE          t4138
+.         COMP    RECORD                                          t4138
+.         JEQ     MAIN                                            t4138
+         COMP    ZERO              Test for End-of-Record (X'00') f4138
+        comp  ZERO              Test for End-of-Record (X'00') f
+         JEQ     MAIN              Exit loop if EOR encountered   f4141
+        jeq   MAIN              Exit loop if EOR encountered   f
+         LDA     SPACE               CHECK SPACE                  f4144
+        lda   SPACE               CHECK SPACE                  f
+         COMP    RECORD                                           f4147
+        comp  RECORD                                           f
+         JEQ     SKIPSP                                           f4150
+        jeq   SKIPSP                                           f
+.STORE RECORD                                                     t4153
+         LDA     IDX                                              f4153
+        lda   IDX                                              f
+         COMP    TWO                                              f4156
+        comp  TWO                                              f
+         JEQ     ST2                                              f4159
+        jeq   ST2                                              f
+         J       ST1                                              f4162
+        j     ST1                                              f
+.SPACE PROCESS                                                    t4165
+SKIPSP   LDA     TWO                                              f4165
+SKIPSP  lda   TWO                                              f
+         STA     IDX                                              f4168
+        sta   IDX                                              f
+         J       RLOOP                                            f4171
+        j     RLOOP                                            f
+ST1      LDX     DIG1                                             f4174
+ST1     ldx   DIG1                                             f
+         LDA     RECORD                                           f4177
+        lda   RECORD                                           f
+         STCH    BUFF1,X                                          f4180
+        stch  BUFF1,X                                          f
+         SUB     K48               SUBS ASCII                     f4183
+        sub   K48               SUBS ASCII                     f
+         STA     RECORD                                           f4186
+        sta   RECORD                                           f
+         LDA     NUM1                                             f4189
+        lda   NUM1                                             f
+         MUL     K10                                              f4192
+        mul   K10                                              f
+         ADD     RECORD                                           f4195
+        add   RECORD                                           f
+         STA     NUM1                                             f4198
+        sta   NUM1                                             f
+         LDA     ONE                                              f4201
+        lda   ONE                                              f
+         ADD     DIG1                                             f4204
+        add   DIG1                                             f
+         J       RLOOP                                            f4207
+        j     RLOOP                                            f
+ST2      LDX     DIG2                                             f4210
+ST2     ldx   DIG2                                             f
+         LDA     RECORD                                           f4213
+        lda   RECORD                                           f
+         STCH    BUFF2,X                                          f4216
+        stch  BUFF2,X                                          f
+         SUB     K48                                              f4219
+        sub   K48                                              f
+         STA     RECORD                                           f4222
+        sta   RECORD                                           f
+         LDA     NUM2                                             f4225
+        lda   NUM2                                             f
+         MUL     K10                                              f4228
+        mul   K10                                              f
+         ADD     RECORD                                           f4231
+        add   RECORD                                           f
+         STA     NUM2                                             f4234
+        sta   NUM2                                             f
+         LDA     ONE                                              f4237
+        lda   ONE                                              f
+         ADD     DIG2                                             f4240
+        add   DIG2                                             f
+         J       RLOOP                                            f4243
+        j     RLOOP                                            f
+.COMPARE LARGE SMALL                                              t4246
+MAIN     LDA     ONE                  THE SMALLEST GCD            f4246
+MAIN    lda   ONE                  THE SMALLEST GCD            f
+         STA     GCD                                              f4249
+        sta   GCD                                              f
+         LDA     NUM1                                             f4252
+        lda   NUM1                                             f
+         COMP    NUM2                                             f4255
+        comp  NUM2                                             f
+         JLT     TWOBIG              NUM2 IS BIGGER               f4258
+        jlt   TWOBIG              NUM2 IS BIGGER               f
+         LDA     NUM2                 NUM1 IS BIGGER              f4261
+        lda   NUM2                 NUM1 IS BIGGER              f
+         STA     RANGE               RANGE IS NUM2                f4264
+        sta   RANGE               RANGE IS NUM2                f
+TWOBIG   LDA     NUM1                                             f4267
+TWOBIG  lda   NUM1                                             f
+         STA     RANGE                RANGE IS NUM1               f4270
+        sta   RANGE                RANGE IS NUM1               f
+.GCD                                                              t4273
+FIND     LDX     ONE                                              f4273
+FIND    ldx   ONE                                              f
+DIV1     LDA     NUM1                                             f4276
+DIV1    lda   NUM1                                             f
+         STX     GCDTEP                                           f4279
+        stx   GCDTEP                                           f
+         DIV     GCDTEP            AREG IS Q                      f4282
+        div   GCDTEP            AREG IS Q                      f
+         MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO Nf4285
+        mul   GCDTEP            AREG IS PRODUCT WHETHER EQUTO Nf
+         COMP    NUM1                                             f4288
+        comp  NUM1                                             f
+         JEQ     DIV2                                             f4291
+        jeq   DIV2                                             f
+         J       ADD1                                             f4294
+        j     ADD1                                             f
+DIV2     LDA     NUM2                                             f4297
+DIV2    lda   NUM2                                             f
+         STX     GCDTEP                                           f4300
+        stx   GCDTEP                                           f
+         DIV     GCDTEP            AREG IS Q                      f4303
+        div   GCDTEP            AREG IS Q                      f
+         MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO Nf4306
+        mul   GCDTEP            AREG IS PRODUCT WHETHER EQUTO Nf
+         COMP    NUM2                                             f4309
+        comp  NUM2                                             f
+         JEQ     UPDATE                                           f4312
+        jeq   UPDATE                                           f
+         J       ADD1                                             f4315
+        j     ADD1                                             f
+UPDATE   STX     GCD                                              f4318
+UPDATE  stx   GCD                                              f
+ADD1     TIX     RANGE                                            f4321
+ADD1    tix   RANGE                                            f
+         JLT     DIV1                                             f4324
+        jlt   DIV1                                             f
+.write output                                                     t4327
+         LDX     ZERO               Initialize index register     f4327
+        ldx   ZERO               Initialize index register     f
+PUTCH1   LDCH    MSG1,X             Load via index the next char  f4330
+PUTCH1  ldch  MSG1,X             Load via index the next char  f
+         TD      OUTDEV             Output Device ready?          f4333
+        td    OUTDEV             Output Device ready?          f
+         JEQ     PUTCH1                                           f4336
+        jeq   PUTCH1                                           f
+         WD      OUTDEV             Output/Display the character  f4339
+        wd    OUTDEV             Output/Display the character  f
+         TIX     MSIZE1             End of Message reached?       f4342
+        tix   MSIZE1             End of Message reached?       f
+         JLT     PUTCH1             Loop                          f4345
+        jlt   PUTCH1             Loop                          f
+.                                                                 t4348
+         LDX     ZERO               Initialize index register     f4348
+        ldx   ZERO               Initialize index register     f
+WNUM1    LDCH    BUFF1,X             Load via index the next char f4351
+WNUM1   ldch  BUFF1,X             Load via index the next char f
+         TD      OUTDEV             Output Device ready?          f4354
+        td    OUTDEV             Output Device ready?          f
+         JEQ     WNUM1                                            f4357
+        jeq   WNUM1                                            f
+         WD      OUTDEV             Output/Display the character  f4360
+        wd    OUTDEV             Output/Display the character  f
+         TIX     DIG1               End of Message reached?       f4363
+        tix   DIG1               End of Message reached?       f
+         JLT     WNUM1              Loop                          f4366
+        jlt   WNUM1              Loop                          f
+.                                                                 t4369
+         LDX     ZERO               Initialize index register     f4369
+        ldx   ZERO               Initialize index register     f
+PUTCH2   LDCH    MSG2,X             Load via index the next char  f4372
+PUTCH2  ldch  MSG2,X             Load via index the next char  f
+         TD      OUTDEV             Output Device ready?          f4375
+        td    OUTDEV             Output Device ready?          f
+         JEQ     PUTCH2                                           f4378
+        jeq   PUTCH2                                           f
+         WD      OUTDEV             Output/Display the character  f4381
+        wd    OUTDEV             Output/Display the character  f
+         TIX     MSIZE2             End of Message reached?       f4384
+        tix   MSIZE2             End of Message reached?       f
+         JLT     PUTCH2             Loop                          f4387
+        jlt   PUTCH2             Loop                          f
+.                                                                 t4390
+         LDX     ZERO                Initialize index register    f4390
+        ldx   ZERO                Initialize index register    f
+WNUM2    LDCH    BUFF2,X             Load via index the next char f4393
+WNUM2   ldch  BUFF2,X             Load via index the next char f
+         TD      OUTDEV              Output Device ready?         f4396
+        td    OUTDEV              Output Device ready?         f
+         JEQ     WNUM2                                            f4399
+        jeq   WNUM2                                            f
+         WD      OUTDEV             Output/Display the character  f4402
+        wd    OUTDEV             Output/Display the character  f
+         TIX     DIG2                End of Message reached?      f4405
+        tix   DIG2                End of Message reached?      f
+         JLT     WNUM2              Loop                          f4408
+        jlt   WNUM2              Loop                          f
+.                                                                 t4411
+         LDX     ZERO               Initialize index register     f4411
+        ldx   ZERO               Initialize index register     f
+PUTCH3   LDCH    MSG3,X             Load via index the next char  f4414
+PUTCH3  ldch  MSG3,X             Load via index the next char  f
+         TD      OUTDEV             Output Device ready?          f4417
+        td    OUTDEV             Output Device ready?          f
+         JEQ     PUTCH3                                           f4420
+        jeq   PUTCH3                                           f
+         WD      OUTDEV             Output/Display the character  f4423
+        wd    OUTDEV             Output/Display the character  f
+         TIX     MSIZE3             End of Message reached?       f4426
+        tix   MSIZE3             End of Message reached?       f
+         JLT     PUTCH3             Loop                          f4429
+        jlt   PUTCH3             Loop                          f
+.                                                                 t4432
+OUTPUT   LDA     GCD                                              f4432
+OUTPUT  lda   GCD                                              f
+DIV100   DIV     K100                                             f4435
+DIV100  div   K100                                             f
+         STA     QUO1                                             f4438
+        sta   QUO1                                             f
+         COMP    ZERO                                             f4441
+        comp  ZERO                                             f
+         JEQ     DIV10                                            f4444
+        jeq   DIV10                                            f
+         LDA     K48                                              f4447
+        lda   K48                                              f
+         ADD     QUO1                                             f4450
+        add   QUO1                                             f
+         WD      OUTDEV             Output/Display the character  f4453
+        wd    OUTDEV             Output/Display the character  f
+DIV10    LDA     K100                                             f4456
+DIV10   lda   K100                                             f
+         MUL     QUO1                                             f4459
+        mul   QUO1                                             f
+         STA     TEMP                                             f4462
+        sta   TEMP                                             f
+         LDA     GCD                                              f4465
+        lda   GCD                                              f
+         SUB     TEMP                GET TEN DECIMAL GCD          f4468
+        sub   TEMP                GET TEN DECIMAL GCD          f
+         STA     TEMP2               STORE THE RESULT TO DIV1     f4471
+        sta   TEMP2               STORE THE RESULT TO DIV1     f
+         DIV     K10                                              f4474
+        div   K10                                              f
+         STA     QUO2                                             f4477
+        sta   QUO2                                             f
+         COMP    ZERO                                             f4480
+        comp  ZERO                                             f
+         JEQ     DIV1                                             f4483
+        jeq   DIV1                                             f
+         LDA     K48                                              f4486
+        lda   K48                                              f
+         ADD     QUO2                                             f4489
+        add   QUO2                                             f
+         WD      OUTDEV             Output/Display the character  f4492
+        wd    OUTDEV             Output/Display the character  f
+DIVONE   LDA     K10                                              f4495
+DIVONE  lda   K10                                              f
+         MUL     QUO2                                             f4498
+        mul   QUO2                                             f
+         STA     TEMP                                             f4501
+        sta   TEMP                                             f
+         LDA     TEMP2                                            f4504
+        lda   TEMP2                                            f
+         SUB     TEMP                GET TEN DECIMAL GCD          f4507
+        sub   TEMP                GET TEN DECIMAL GCD          f
+         STA     QUO3                                             f4510
+        sta   QUO3                                             f
+         LDA     K48                                              f4513
+        lda   K48                                              f
+         ADD     QUO3                                             f4516
+        add   QUO3                                             f
+         WD      OUTDEV             Output/Display the character  f4519
+        wd    OUTDEV             Output/Display the character  f
+         RSUB                       Program Return/Exit           f4522
+        rsub                     Program Return/Exit           f
+..DATA                                                            t4525
+RETADR   RESW    1                                                f4525
+RETADR  resw  1                                                f
+ZERO     WORD    0                                                f4528
+ZERO    word  0                                                f
+ONE      WORD    1                                                f4531
+ONE     word  1                                                f
+TWO      WORD    2                                                f4534
+TWO     word  2                                                f
+THREE    WORD    3                                                f4537
+THREE   word  3                                                f
+K10      WORD    10                                               f4540
+K10     word  10                                               f
+K48      WORD    48                                               f4543
+K48     word  48                                               f
+K100     WORD    100                                              f4546
+K100    word  100                                              f
+ENTER    WORD    10                CHAGE LINE                     f4549
+ENTER   word  10                CHAGE LINE                     f
+SPACE    WORD    32                                               f4552
+SPACE   word  32                                               f
+.                                                                 t4555
+INPUT    BYTE    X'F3'             Code for the input device      f4555
+INPUT   byte  X'F3'             Code for the input device      f
+OUTDEV   BYTE    X'05'             Code for the output device     f4556
+OUTDEV  byte  X'05'             Code for the output device     f
+RECORD   RESW    1                                                f4557
+RECORD  resw  1                                                f
+IDX      RESW    1                  CURRENT POINT TO NUM          f4560
+IDX     resw  1                  CURRENT POINT TO NUM          f
+BUFF1    RESB    3                                                f4563
+BUFF1   resb  3                                                f
+BUFF2    RESB    3                                                f4566
+BUFF2   resb  3                                                f
+DIG1     RESW    1                                                f4569
+DIG1    resw  1                                                f
+DIG2     RESW    1                                                f4572
+DIG2    resw  1                                                f
+NUM1     RESW    1                                                f4575
+NUM1    resw  1                                                f
+NUM2     RESW    1                                                f4578
+NUM2    resw  1                                                f
+.                                                                 t4581
+GCD      RESW    1                                                f4581
+GCD     resw  1                                                f
+GCDTEP   RESW    1                                                f4584
+GCDTEP  resw  1                                                f
+RANGE    RESW    1                                                f4587
+RANGE   resw  1                                                f
+MSG1     BYTE    C'GCD('                                          f4590
+MSG1    byte  C'GCD('                                          f
+MSG2     BYTE    C', '                                            f4594
+MSG2    byte  C', '                                            f
+MSG3     BYTE    C') ='                                           f4596
+MSG3    byte  C') ='                                           f
+MSIZE1   WORD    5                  Size of the message           f4599
+MSIZE1  word  5                  Size of the message           f
+MSIZE2   WORD    3                  Size of the message           f4602
+MSIZE2  word  3                  Size of the message           f
+MSIZE3   WORD    4                  Size of the message           f4605
+MSIZE3  word  4                  Size of the message           f
+QUO1     WORD    1                  HUNDRED                       f4608
+QUO1    word  1                  HUNDRED                       f
+QUO2     WORD    1                  TEN                           f4611
+QUO2    word  1                  TEN                           f
+QUO3     WORD    1                  ONE                           f4614
+QUO3    word  1                  ONE                           f
+TEMP     WORD    1                                                f4617
+TEMP    word  1                                                f
+TEMP2    WORD    1                                                f4620
+TEMP2   word  1                                                f
+.                                                                 t4623
+         END     FIRST                                            f4623
+        end   FIRST                                            f

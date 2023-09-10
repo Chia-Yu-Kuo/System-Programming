@@ -1,0 +1,224 @@
+SIC Assembler Ver-1.3r Rel. 202111-r02
+
+            .  Notes:                                                         
+            .  (1) This program is the same as the program in Figure 2.5 (pp. 
+            .  (2) This file is an example source program for SIC/XE Assembler
+            .  (3) The fixed format of each line:                             
+            .          COL. 1       - . (the entire line is comment)          
+            .          COL. 1 ~ 8   - Label (optional)                        
+            .          COL. 9       - Blank                                   
+            .          COL. 10 ~ 15 - Operation code mnemonic or assembler dir
+            .          COL. 16 ~ 17 - Blank                                   
+            .          COL. 18 ~ 35 - Operand(s)                              
+            .          COL. 36 ~ 66 - Comment (optional)                      
+            .  Usage:                                                         
+            .  (A) Rename this file to SRCFILE                                
+            .  (B) Execute SIC/XE assembler                                   
+            .                                                                 
+            .0       1         2         3         4         5         6      
+            .23456789012345678901234567890123456789012345678901234567890123456
+            .                                                                 
+            .                                                                 
+            .                                                                 
+            .                                                                 
+            .                                                                 
+            .START                                                            
+1000        HW1      START   1000                                             
+1000 1411AD FIRST    STL     RETADR            Save return address            
+            .read input PROCESS                                               
+1003 0411B0 READ     LDX     ZERO              Clear loop counter             
+1006 0011B3          LDA     ONE               Clear  registerA to zero       
+1009 0C11D0          STA     IDX               CURRENT POINT TO NUM1          
+100C 0011B0          LDA     ZERO                                             
+100F 0C11D9          STA     DIG1                                             
+1012 0C11DC          STA     DIG2                                             
+1015 0C11DF          STA     NUM1              INITIALIZE NUM1 NUM2           
+1018 0C11E2          STA     NUM2                                             
+101B E011CB RLOOP    TD      INPUT             Test input device              
+101E 30101B          JEQ     RLOOP             Loop until device ready        
+1021 0011B0          LDA     ZERO                                             
+1024 0C11CD          STA     RECORD             INITIALIZE RECORD             
+1027 D811CB          RD      INPUT                                            
+            .check record                                                     
+            .         LDA     ENTER                CHECK CHANGE LINE          
+            .         COMP    RECORD                                          
+            .         JEQ     MAIN                                            
+102A 2811B0          COMP    ZERO              Test for End-of-Record (X'00') 
+102D 301096          JEQ     MAIN              Exit loop if EOR encountered   
+1030 0011C8          LDA     SPACE               CHECK SPACE                  
+1033 2811CD          COMP    RECORD                                           
+1036 301045          JEQ     SKIPSP                                           
+            .STORE RECORD                                                     
+1039 0011D0          LDA     IDX                                              
+103C 2811B6          COMP    TWO                                              
+103F 301072          JEQ     ST2                                              
+1042 3C104E          J       ST1                                              
+            .SPACE PROCESS                                                    
+1045 0011B6 SKIPSP   LDA     TWO                                              
+1048 0C11D0          STA     IDX                                              
+104B 3C101B          J       RLOOP                                            
+104E 0411D9 ST1      LDX     DIG1                                             
+1051 0011CD          LDA     RECORD                                           
+1054 5491D3          STCH    BUFF1,X                                          
+1057 1C11BF          SUB     K48               SUBS ASCII                     
+105A 0C11CD          STA     RECORD                                           
+105D 0011DF          LDA     NUM1                                             
+1060 2011BC          MUL     K10                                              
+1063 1811CD          ADD     RECORD                                           
+1066 0C11DF          STA     NUM1                                             
+1069 0011B3          LDA     ONE                                              
+106C 1811D9          ADD     DIG1                                             
+106F 3C101B          J       RLOOP                                            
+1072 0411DC ST2      LDX     DIG2                                             
+1075 0011CD          LDA     RECORD                                           
+1078 5491D6          STCH    BUFF2,X                                          
+107B 1C11BF          SUB     K48                                              
+107E 0C11CD          STA     RECORD                                           
+1081 0011E2          LDA     NUM2                                             
+1084 2011BC          MUL     K10                                              
+1087 1811CD          ADD     RECORD                                           
+108A 0C11E2          STA     NUM2                                             
+108D 0011B3          LDA     ONE                                              
+1090 1811DC          ADD     DIG2                                             
+1093 3C101B          J       RLOOP                                            
+            .COMPARE LARGE SMALL                                              
+1096 0011B3 MAIN     LDA     ONE                  THE SMALLEST GCD            
+1099 0C11E5          STA     GCD                                              
+109C 0011DF          LDA     NUM1                                             
+109F 2811E2          COMP    NUM2                                             
+10A2 3810AB          JLT     TWOBIG              NUM2 IS BIGGER               
+10A5 0011E2          LDA     NUM2                 NUM1 IS BIGGER              
+10A8 0C11EB          STA     RANGE               RANGE IS NUM2                
+10AB 0011DF TWOBIG   LDA     NUM1                                             
+10AE 0C11EB          STA     RANGE                RANGE IS NUM1               
+            .GCD                                                              
+10B1 0411B3 FIND     LDX     ONE                                              
+10B4 0011DF DIV1     LDA     NUM1                                             
+10B7 1011E8          STX     GCDTEP                                           
+10BA 2411E8          DIV     GCDTEP            AREG IS Q                      
+10BD 2011E8          MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO N
+10C0 2811DF          COMP    NUM1                                             
+10C3 3010C9          JEQ     DIV2                                             
+10C6 3C10E1          J       ADD1                                             
+10C9 0011E2 DIV2     LDA     NUM2                                             
+10CC 1011E8          STX     GCDTEP                                           
+10CF 2411E8          DIV     GCDTEP            AREG IS Q                      
+10D2 2011E8          MUL     GCDTEP            AREG IS PRODUCT WHETHER EQUTO N
+10D5 2811E2          COMP    NUM2                                             
+10D8 3010DE          JEQ     UPDATE                                           
+10DB 3C10E1          J       ADD1                                             
+10DE 1011E5 UPDATE   STX     GCD                                              
+10E1 2C11EB ADD1     TIX     RANGE                                            
+10E4 3810B4          JLT     DIV1                                             
+            .write output                                                     
+10E7 0411B0          LDX     ZERO               Initialize index register     
+10EA 5091EE PUTCH1   LDCH    MSG1,X             Load via index the next char  
+10ED E011CC          TD      OUTDEV             Output Device ready?          
+10F0 3010EA          JEQ     PUTCH1                                           
+10F3 DC11CC          WD      OUTDEV             Output/Display the character  
+10F6 2C11F7          TIX     MSIZE1             End of Message reached?       
+10F9 3810EA          JLT     PUTCH1             Loop                          
+            .                                                                 
+10FC 0411B0          LDX     ZERO               Initialize index register     
+10FF 5091D3 WNUM1    LDCH    BUFF1,X             Load via index the next char 
+1102 E011CC          TD      OUTDEV             Output Device ready?          
+1105 3010FF          JEQ     WNUM1                                            
+1108 DC11CC          WD      OUTDEV             Output/Display the character  
+110B 2C11D9          TIX     DIG1               End of Message reached?       
+110E 3810FF          JLT     WNUM1              Loop                          
+            .                                                                 
+1111 0411B0          LDX     ZERO               Initialize index register     
+1114 5091F2 PUTCH2   LDCH    MSG2,X             Load via index the next char  
+1117 E011CC          TD      OUTDEV             Output Device ready?          
+111A 301114          JEQ     PUTCH2                                           
+111D DC11CC          WD      OUTDEV             Output/Display the character  
+1120 2C11FA          TIX     MSIZE2             End of Message reached?       
+1123 381114          JLT     PUTCH2             Loop                          
+            .                                                                 
+1126 0411B0          LDX     ZERO                Initialize index register    
+1129 5091D6 WNUM2    LDCH    BUFF2,X             Load via index the next char 
+112C E011CC          TD      OUTDEV              Output Device ready?         
+112F 301129          JEQ     WNUM2                                            
+1132 DC11CC          WD      OUTDEV             Output/Display the character  
+1135 2C11DC          TIX     DIG2                End of Message reached?      
+1138 381129          JLT     WNUM2              Loop                          
+            .                                                                 
+113B 0411B0          LDX     ZERO               Initialize index register     
+113E 5091F4 PUTCH3   LDCH    MSG3,X             Load via index the next char  
+1141 E011CC          TD      OUTDEV             Output Device ready?          
+1144 30113E          JEQ     PUTCH3                                           
+1147 DC11CC          WD      OUTDEV             Output/Display the character  
+114A 2C11FD          TIX     MSIZE3             End of Message reached?       
+114D 38113E          JLT     PUTCH3             Loop                          
+            .                                                                 
+1150 0011E5 OUTPUT   LDA     GCD                                              
+1153 2411C2 DIV100   DIV     K100                                             
+1156 0C1200          STA     QUO1                                             
+1159 2811B0          COMP    ZERO                                             
+115C 301168          JEQ     DIV10                                            
+115F 0011BF          LDA     K48                                              
+1162 181200          ADD     QUO1                                             
+1165 DC11CC          WD      OUTDEV             Output/Display the character  
+1168 0011C2 DIV10    LDA     K100                                             
+116B 201200          MUL     QUO1                                             
+116E 0C1209          STA     TEMP                                             
+1171 0011E5          LDA     GCD                                              
+1174 1C1209          SUB     TEMP                GET TEN DECIMAL GCD          
+1177 0C120C          STA     TEMP2               STORE THE RESULT TO DIV1     
+117A 2411BC          DIV     K10                                              
+117D 0C1203          STA     QUO2                                             
+1180 2811B0          COMP    ZERO                                             
+1183 3010B4          JEQ     DIV1                                             
+1186 0011BF          LDA     K48                                              
+1189 181203          ADD     QUO2                                             
+118C DC11CC          WD      OUTDEV             Output/Display the character  
+118F 0011BC DIVONE   LDA     K10                                              
+1192 201203          MUL     QUO2                                             
+1195 0C1209          STA     TEMP                                             
+1198 00120C          LDA     TEMP2                                            
+119B 1C1209          SUB     TEMP                GET TEN DECIMAL GCD          
+119E 0C1206          STA     QUO3                                             
+11A1 0011BF          LDA     K48                                              
+11A4 181206          ADD     QUO3                                             
+11A7 DC11CC          WD      OUTDEV             Output/Display the character  
+11AA 4C0000          RSUB                       Program Return/Exit           
+            ..DATA                                                            
+11AD        RETADR   RESW    1                                                
+11B0 000000 ZERO     WORD    0                                                
+11B3 000001 ONE      WORD    1                                                
+11B6 000002 TWO      WORD    2                                                
+11B9 000003 THREE    WORD    3                                                
+11BC 00000A K10      WORD    10                                               
+11BF 000030 K48      WORD    48                                               
+11C2 000064 K100     WORD    100                                              
+11C5 00000A ENTER    WORD    10                CHAGE LINE                     
+11C8 000020 SPACE    WORD    32                                               
+            .                                                                 
+11CB F3     INPUT    BYTE    X'F3'             Code for the input device      
+11CC 05     OUTDEV   BYTE    X'05'             Code for the output device     
+11CD        RECORD   RESW    1                                                
+11D0        IDX      RESW    1                  CURRENT POINT TO NUM          
+11D3        BUFF1    RESB    3                                                
+11D6        BUFF2    RESB    3                                                
+11D9        DIG1     RESW    1                                                
+11DC        DIG2     RESW    1                                                
+11DF        NUM1     RESW    1                                                
+11E2        NUM2     RESW    1                                                
+            .                                                                 
+11E5        GCD      RESW    1                                                
+11E8        GCDTEP   RESW    1                                                
+11EB        RANGE    RESW    1                                                
+11EE 474344 MSG1     BYTE    C'GCD('                                          
+     28
+11F2 2C20   MSG2     BYTE    C', '                                            
+11F4 29203D MSG3     BYTE    C') ='                                           
+11F7 000005 MSIZE1   WORD    5                  Size of the message           
+11FA 000003 MSIZE2   WORD    3                  Size of the message           
+11FD 000004 MSIZE3   WORD    4                  Size of the message           
+1200 000001 QUO1     WORD    1                  HUNDRED                       
+1203 000001 QUO2     WORD    1                  TEN                           
+1206 000001 QUO3     WORD    1                  ONE                           
+1209 000001 TEMP     WORD    1                                                
+120C 000001 TEMP2    WORD    1                                                
+            .                                                                 
+120F                 END     FIRST                                            
